@@ -1,0 +1,15 @@
+metadata:
+  name: python-rng
+  namespace: argo
+spec:
+  templates:
+    - name: python-rng
+      outputs:
+        parameters:
+          - name: output-param-1
+            valueFrom:
+              path: /tmp/output
+      container:
+        name: python-rng
+        image: 'gnovack/argo-artifacts-python-rng:latest'
+  entrypoint: python-rng

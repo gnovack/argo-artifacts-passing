@@ -1,0 +1,40 @@
+kind: Workflow
+metadata:
+  generateName: basic-artifact-passing-
+  namespace: argo
+spec:
+  entrypoint: steps
+  templates:
+
+    - name: python-rng-csv
+      outputs:
+        artifacts:
+          - name: output
+            path: /tmp/output.csv
+      container:
+        name: python-rng-csv
+        image: 'gnovack/argo-artifacts-python-rng-csv:latest'
+
+    - name: python-sum-csv
+      inputs:
+        artifacts:
+          - name: input
+            path: /tmp/input.csv
+      outputs:
+        artifacts:
+          - name: output
+            path: /tmp/output.csv
+      container:
+        name: python-sum-csv
+        image: 'gnovack/argo-artifacts-python-sum-csv:latest'
+
+    - name: steps
+      steps:
+        - - name: python-rng-csv
+            template: python-rng-csv
+        - - name: python-sum-csv
+            template: python-sum-csv
+            arguments:
+              artifacts:
+              - name: input
+                from: "{{steps.python-rng-csv.outputs.artifacts.output}}"

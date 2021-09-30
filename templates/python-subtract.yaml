@@ -1,0 +1,28 @@
+metadata:
+  name: python-subtract
+  namespace: argo
+spec:
+  templates:
+    - name: python-subtract
+      inputs:
+        parameters:
+          - name: value-1
+          - name: value-2
+      outputs:
+        parameters:
+          - name: difference
+            valueFrom:
+              path: /tmp/output
+      container:
+        name: python-subtract
+        image: 'gnovack/argo-artifacts-python-subtract:latest'
+        args:
+          - '{{inputs.parameters.value-1}}'
+          - '{{inputs.parameters.value-2}}'
+  entrypoint: python-subtract
+  arguments:
+    parameters:
+      - name: value-1
+        value: '0'
+      - name: value-2
+        value: '0'

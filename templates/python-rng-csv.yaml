@@ -1,0 +1,15 @@
+kind: Workflow
+metadata:
+  generateName: python-rng-csv-
+  namespace: argo
+spec:
+  templates:
+    - name: python-rng-csv
+      outputs:
+        artifacts:
+          - name: output
+            path: /tmp/output.csv
+      container:
+        name: python-rng-csv
+        image: 'gnovack/argo-artifacts-python-rng-csv:latest'
+  entrypoint: python-rng-csv

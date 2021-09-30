@@ -1,0 +1,56 @@
+kind: Workflow
+metadata:
+  generateName: subtract-random-numbers-
+  namespace: argo
+spec:
+  entrypoint: steps
+  templates:
+
+    - name: python-rng
+      outputs:
+        parameters:
+          - name: output-param-1
+            valueFrom:
+              path: /tmp/output
+      container:
+        name: python-rng
+        image: 'gnovack/argo-artifacts-python-rng:latest'
+
+    - name: python-subtract
+      inputs:
+        parameters:
+          - name: value-1
+          - name: value-2
+      outputs:
+        parameters:
+          - name: difference
+            valueFrom:
+              path: /tmp/output
+      container:
+        name: python-subtract
+        image: 'gnovack/argo-artifacts-python-subtract:latest'
+        args:
+          - '{{inputs.parameters.value-1}}'
+          - '{{inputs.parameters.value-2}}'
+
+    - name: steps
+      steps:
+        - - name: rng-1
+            template: python-rng
+          - name: rng-2
+            template: python-rng
+        - - name: subtract
+            arguments:
+              parameters:
+                - name: value-1
+                  value: '{{steps.rng-1.outputs.parameters.output-param-1}}'
+                - name: value-2
+                  value: '{{steps.rng-2.outputs.parameters.output-param-1}}'
+            template: python-subtract
+      outputs:
+        parameters:
+          - name: result
+            valueFrom:
+              expression: > 
+                asInt(steps.subtract.outputs.parameters.difference) >= 0 ? asInt(steps.subtract.outputs.parameters.difference)
+                : asInt(steps.subtract.outputs.parameters.difference) * -1
